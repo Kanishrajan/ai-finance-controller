@@ -10,11 +10,10 @@ dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
-
+async function configureApp() {
   // Initialize static CSV fixtures and demo datasets
   try {
     seedStaticCsvFiles();
@@ -59,6 +58,21 @@ async function startServer() {
   // Error handling middleware
   app.use(errorHandler);
 
+  const isVercelDeployment = Boolean(process.env.VERCEL);
+
+  if (isVercelDeployment) {
+    const distPath = path.join(__dirname, 'dist');
+    app.use(express.static(distPath));
+    app.get('*', (req, res) => {
+      const requestedPath = req.path || '/';
+      if (requestedPath.startsWith('/api') || requestedPath.startsWith('/data')) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+    return app;
+  }
+
   // Vite development middleware or production static serving
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
@@ -75,7 +89,16 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  return app;
+}
+
+configureApp().then((serverApp) => {
+  if (process.env.VERCEL) {
+    export default serverApp;
+    return;
+  }
+
+  serverApp.listen(PORT, '0.0.0.0', () => {
     console.log(`====================================================`);
     console.log(` AI FINANCE CONTROLLER — SERVER RUNNING`);
     console.log(` Address: http://0.0.0.0:${PORT}`);
@@ -83,9 +106,9 @@ async function startServer() {
     console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`====================================================`);
   });
-}
-
-startServer().catch(err => {
+}).catch(err => {
   console.error('[Server Startup Error]', err);
   process.exit(1);
 });
+
+export default app;
