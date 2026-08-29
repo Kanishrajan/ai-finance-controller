@@ -111,4 +111,4 @@ configureApp().then((serverApp) => {
   process.exit(1);
 });
 
-export default app;
+module.exports = serverApp;
