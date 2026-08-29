@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: `${import.meta.env.VITE_API_URL}/api/v1`,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -15,6 +15,7 @@ const api = axios.create({
 export function setUserRole(role, name) {
   localStorage.setItem('user_role', role);
   localStorage.setItem('user_name', name);
+
   api.defaults.headers['X-User-Role'] = role;
   api.defaults.headers['X-User-Name'] = name;
 }
