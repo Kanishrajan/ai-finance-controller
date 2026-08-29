@@ -93,11 +93,6 @@ async function configureApp() {
 }
 
 configureApp().then((serverApp) => {
-  if (process.env.VERCEL) {
-    export default serverApp;
-    return;
-  }
-
   serverApp.listen(PORT, '0.0.0.0', () => {
     console.log(`====================================================`);
     console.log(` AI FINANCE CONTROLLER — SERVER RUNNING`);
