@@ -1,0 +1,6 @@
+{
+  "name": "AI Finance Controller",
+  "description": "AI-assisted financial reconciliation controller for whole-batch processing, exception detection, automated matching, AI analysis, human review, and audit logging.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
